@@ -37,11 +37,12 @@ public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = "xxx";
     BluetoothLeScanner scanner;
-    TextView tvMac, tvGpsLat, tvGpsLon;
+    TextView tvMac, tvGpsLat, tvGpsLon, tvRaw;
     Long tsLong_old = 0L;
     Long ts_add_gps =0L;
     File myExternalFile;
     String fileContent;
+    private static final char[] HEX_ARRAY = "0123456789ABCDEF".toCharArray();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -50,6 +51,7 @@ public class MainActivity extends AppCompatActivity {
         tvMac =findViewById(R.id.tvMac);
         tvGpsLat =findViewById(R.id.tvLat);
         tvGpsLon =findViewById(R.id.tvLon);
+        tvRaw =findViewById(R.id.tvRaw);
         Permission.askForPermissions(this);
         BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
         scanner= adapter.getBluetoothLeScanner();
@@ -72,6 +74,7 @@ public class MainActivity extends AppCompatActivity {
         byte[] advertiseData = result.getScanRecord().getBytes();
         boolean valid = checkBasicDiscoverCondition(advertiseData);
         if (valid){
+            tvRaw.setText(bytesToHex(advertiseData));
             parsingGps(advertiseData);
         }else
         {
@@ -110,13 +113,13 @@ public class MainActivity extends AppCompatActivity {
 
         public void writeFileOnInternalStorage(float p_lat, float p_lon){
             Long tsLong = System.currentTimeMillis()/1000;
-            String ts = tsLong.toString();
+            Date cDate = new Date();
             if(tsLong -ts_add_gps >5){
-                fileContent += ts+","+p_lat+","+p_lon+"\n";
+                fileContent += new SimpleDateFormat("hhmmss").format(cDate)+","+p_lat+","+p_lon+"\n";
                 ts_add_gps =tsLong;
             }
-            Date cDate = new Date();
-            if(tsLong -tsLong_old >60){
+
+            if(tsLong -tsLong_old >300){
                 myExternalFile = new File(getExternalFilesDir("gps"), new SimpleDateFormat("hhmmss").format(cDate).concat(".csv"));
                 tsLong_old =tsLong;
                 if(isStoragePermissionGranted()) {
@@ -161,6 +164,15 @@ public class MainActivity extends AppCompatActivity {
         }
         ScanSettings settings = new ScanSettings.Builder().setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY).build();
         scanner.startScan(filters, settings, scanCallback);
+    }
+    public static String bytesToHex(byte[] bytes) {
+        char[] hexChars = new char[bytes.length * 2];
+        for (int j = 0; j < bytes.length; j++) {
+            int v = bytes[j] & 0xFF;
+            hexChars[j * 2] = HEX_ARRAY[v >>> 4];
+            hexChars[j * 2 + 1] = HEX_ARRAY[v & 0x0F];
+        }
+        return new String(hexChars);
     }
     private boolean checkBasicDiscoverCondition(byte[] advertiseData) {
         return true;
