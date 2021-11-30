@@ -37,7 +37,7 @@ public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = "xxx";
     BluetoothLeScanner scanner;
-    TextView tvMac, tvGpsLat, tvGpsLon, tvRaw;
+    TextView tvMac, tvGpsLat, tvGpsLon, tvRaw, tvdbm;
     Long tsLong_old = 0L;
     Long ts_add_gps =0L;
     File myExternalFile;
@@ -52,6 +52,7 @@ public class MainActivity extends AppCompatActivity {
         tvGpsLat =findViewById(R.id.tvLat);
         tvGpsLon =findViewById(R.id.tvLon);
         tvRaw =findViewById(R.id.tvRaw);
+        tvdbm =findViewById(R.id.tvdbm);
         Permission.askForPermissions(this);
         BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
         scanner= adapter.getBluetoothLeScanner();
@@ -69,8 +70,9 @@ public class MainActivity extends AppCompatActivity {
     public void onScanResult(int callbackType, ScanResult result) {
         BluetoothDevice device = result.getDevice();
         Log.d(TAG, "Device: " + device.getName());
+        Log.d(TAG, "onScanResult: "+result.getRssi());
         tvMac.setText(device.getAddress());
-
+        tvdbm.setText(result.getRssi()+" dBm");
         byte[] advertiseData = result.getScanRecord().getBytes();
         boolean valid = checkBasicDiscoverCondition(advertiseData);
         if (valid){
@@ -92,7 +94,7 @@ public class MainActivity extends AppCompatActivity {
             if(p_lon <0 || p_lat <0) {
                 tvGpsLat.setText("0.000000");
                 tvGpsLon.setText("0.000000");
-                writeFileOnInternalStorage(p_lat,p_lon);
+                writeFileOnInternalStorage(0,0);
             }else{
                 tvGpsLat.setText(Float.toString(p_lat));
                 tvGpsLon.setText(Float.toString(p_lon));
@@ -150,7 +152,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void startScanning() {
         Log.d(TAG, "im here 111");
-        String[] peripheralAddresses = new String[]{"D9:74:A1:28:59:28"};
+        String[] peripheralAddresses = new String[]{"D9:74:A1:28:59:28"}; //"D9:74:A1:28:59:28" : devkit2 , "ED:BF:36:11:3A:19",: beacon
         // Build filters list
         List<ScanFilter> filters = null;
         if (peripheralAddresses != null) {
@@ -175,6 +177,7 @@ public class MainActivity extends AppCompatActivity {
         return new String(hexChars);
     }
     private boolean checkBasicDiscoverCondition(byte[] advertiseData) {
+//        return advertiseData[5] == 0x59 && advertiseData[6] == 0x00 && advertiseData[7] == (byte) 0x02;
         return true;
     }
     public boolean isStoragePermissionGranted() {
