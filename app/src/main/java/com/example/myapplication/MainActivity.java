@@ -1,18 +1,22 @@
 package com.example.myapplication;
 
 import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
 import android.Manifest;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
+import android.bluetooth.BluetoothManager;
 import android.bluetooth.le.BluetoothLeScanner;
 import android.bluetooth.le.ScanCallback;
 import android.bluetooth.le.ScanFilter;
 import android.bluetooth.le.ScanResult;
 import android.bluetooth.le.ScanSettings;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
@@ -36,6 +40,8 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = "xxx";
+    BluetoothManager btManager;
+    BluetoothAdapter btAdapter;
     BluetoothLeScanner scanner;
     TextView tvMac, tvGpsLat, tvGpsLon, tvRaw, tvdbm;
     Long tsLong_old = 0L;
@@ -43,6 +49,7 @@ public class MainActivity extends AppCompatActivity {
     File myExternalFile;
     String fileContent;
     private static final char[] HEX_ARRAY = "0123456789ABCDEF".toCharArray();
+    @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -53,15 +60,33 @@ public class MainActivity extends AppCompatActivity {
         tvGpsLon =findViewById(R.id.tvLon);
         tvRaw =findViewById(R.id.tvRaw);
         tvdbm =findViewById(R.id.tvdbm);
+        btManager = (BluetoothManager)getSystemService(Context.BLUETOOTH_SERVICE);
+        btAdapter = btManager.getAdapter();
+        scanner= btAdapter.getBluetoothLeScanner();
         Permission.askForPermissions(this);
-        BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
-        scanner= adapter.getBluetoothLeScanner();
+        // Make sure we have access coarse location enabled, if not, prompt the user to enable it
+        if (this.checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setTitle("This app needs location access");
+            builder.setMessage("Please grant location access so this app can detect peripherals.");
+            builder.setPositiveButton(android.R.string.ok, null);
+            builder.setOnDismissListener(new DialogInterface.OnDismissListener() {
+                @RequiresApi(api = Build.VERSION_CODES.M)
+                @Override
+                public void onDismiss(DialogInterface dialog) {
+                    requestPermissions(new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, 1);
+                }
+            });
+            builder.show();
+        }
+
         if (scanner != null) {
             startScanning();
             Log.d(TAG, "scan started");
         }  else {
             Log.e(TAG, "could not get scanner object");
         }
+
 
     }
     private final ScanCallback scanCallback = new ScanCallback() {
