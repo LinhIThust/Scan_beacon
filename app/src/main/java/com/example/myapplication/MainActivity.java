@@ -31,6 +31,7 @@ import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -38,12 +39,12 @@ import java.util.List;
 
 @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
 public class MainActivity extends AppCompatActivity {
-
+    StringBuffer buffer;
     private static final String TAG = "xxx";
     BluetoothManager btManager;
     BluetoothAdapter btAdapter;
     BluetoothLeScanner scanner;
-    TextView tvMac, tvGpsLat, tvGpsLon, tvRaw, tvdbm;
+    TextView tvMac, tvGpsLat, tvGpsLon, tvRaw, tvdbm, tvCompany, tvLength, tvType, tvUUID, tvMajor, tvMinor;
     Long tsLong_old = 0L;
     Long ts_add_gps =0L;
     File myExternalFile;
@@ -60,8 +61,14 @@ public class MainActivity extends AppCompatActivity {
         tvGpsLon =findViewById(R.id.tvLon);
         tvRaw =findViewById(R.id.tvRaw);
         tvdbm =findViewById(R.id.tvdbm);
+        tvCompany = findViewById(R.id.tvCompany);
+        tvLength =findViewById(R.id.tvLength);
         btManager = (BluetoothManager)getSystemService(Context.BLUETOOTH_SERVICE);
         btAdapter = btManager.getAdapter();
+        tvType =findViewById(R.id.tvType);
+        tvUUID =findViewById(R.id.tvUUID);
+        tvMajor =findViewById(R.id.tvMajor);
+        tvMinor =findViewById(R.id.tvMinor);
         scanner= btAdapter.getBluetoothLeScanner();
         Permission.askForPermissions(this);
         // Make sure we have access coarse location enabled, if not, prompt the user to enable it
@@ -103,6 +110,8 @@ public class MainActivity extends AppCompatActivity {
         if (valid){
             tvRaw.setText(bytesToHex(advertiseData));
             parsingGps(advertiseData);
+            String _s_advertise = bytesToHex(advertiseData);
+            parsingData(advertiseData);
         }else
         {
             return;
@@ -110,6 +119,27 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+        private void parsingData(byte[] advertiseData) {
+
+            tvCompany.setText("0x"+int2Hex(advertiseData[6]) + int2Hex(advertiseData[5]));
+            tvLength.setText("0x"+int2Hex(advertiseData[8]));
+            tvType.setText("0x"+int2Hex(advertiseData[7]));
+            String uuid ="";
+            for (int i =9;i<25;i++){
+                uuid+= int2Hex(advertiseData[i]);
+                if(i %4 ==0 && i<24) uuid+="-";
+            }
+            tvUUID.setText(uuid);
+            tvMajor.setText("0x"+int2Hex(advertiseData[25]) + int2Hex(advertiseData[26]));
+            tvMinor.setText("0x"+int2Hex(advertiseData[27]) + int2Hex(advertiseData[28]));
+//            tvLength.setText();
+
+        }
+        private String int2Hex(int i){
+            i = i&0xFF;
+            if(i<16) return "0"+Integer.toString(i, 16);
+            return ""+Integer.toString(i, 16);
+        }
         private void parsingGps(byte[] advertiseData) {
             long _lon = ((advertiseData[16]& 0xff) <<24) + ((advertiseData[15]& 0xff) <<16) + ((advertiseData[14]& 0xff) <<8) + ((advertiseData[13]& 0xff));
             float p_lon = (float) (105+((_lon*1.0/10000)-10500)/60);
