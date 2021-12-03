@@ -24,9 +24,10 @@
         android:roundIcon="@drawable/bluetooth_icon"
         android:supportsRtl="true"
         android:theme="@style/Theme.MyApplication">
-        <activity android:name=".DetailBeacon">
-
-        </activity>
+        <activity
+            android:name=".ScanBeacon"
+            android:exported="false" />
+        <activity android:name=".DetailBeacon"></activity>
         <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

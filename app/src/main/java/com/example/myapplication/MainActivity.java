@@ -154,17 +154,6 @@ public class MainActivity extends AppCompatActivity {
                 tvGpsLat.setText(Float.toString(p_lat));
                 tvGpsLon.setText(Float.toString(p_lon));
                 writeFileOnInternalStorage(p_lat,p_lon);
-                writeFileOnInternalStorage2(p_lat,p_lon);
-            }
-        }
-
-        private void writeFileOnInternalStorage2(float p_lat, float p_lon) {
-            try {
-                FileWriter fout = new FileWriter("filename.txt", true);
-                fout.append("Hello"+p_lat);
-                fout.close();
-            } catch (IOException e) {
-                e.printStackTrace();
             }
         }
 
