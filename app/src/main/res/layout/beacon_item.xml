@@ -28,20 +28,20 @@
             app:srcCompat="@drawable/blt_icon" />
 
         <ImageView
-            android:id="@+id/imageView2"
+            android:id="@+id/ivExtend"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="8dp"
             android:layout_marginRight="8dp"
-            android:padding="8"
+            android:padding="8dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:srcCompat="@drawable/ic_baseline_arrow_drop_down_circle_24"
+            app:srcCompat="@drawable/ic_baseline_arrow_downward_24"
             tools:ignore="VectorDrawableCompat" />
 
         <TextView
-            android:id="@+id/textView"
+            android:id="@+id/tvBeaconMac"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
@@ -53,19 +53,21 @@
             app:layout_constraintTop_toTopOf="@+id/imageView" />
 
         <TextView
-            android:id="@+id/textView12"
+            android:id="@+id/tvBeaconRssi"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:text="-47 dBm"
             android:textColor="@color/teal_700"
             app:layout_constraintBottom_toBottomOf="@+id/imageView"
-            app:layout_constraintStart_toStartOf="@+id/textView"
-            app:layout_constraintTop_toBottomOf="@+id/textView" />
+            app:layout_constraintStart_toStartOf="@+id/tvBeaconMac"
+            app:layout_constraintTop_toBottomOf="@+id/tvBeaconMac" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <LinearLayout
-        android:layout_width="409dp"
+        android:id="@+id/llExtend"
+        android:visibility="gone"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:layout_marginLeft="8dp"

@@ -9,11 +9,12 @@ public class BeaconInfo {
     private String beaconUuid;
     private Integer beaconMajor;
     private Integer beaconMinor;
+    private Integer beaconRssi;
 
     public BeaconInfo() {
     }
 
-    public BeaconInfo(String beaconName, String beaconMac, String beaconCompanyId, Integer beaconLenData, String beaconTypeData, String beaconUuid, Integer beaconMajor, Integer beaconMinor) {
+    public BeaconInfo(String beaconName, String beaconMac, String beaconCompanyId, Integer beaconLenData, String beaconTypeData, String beaconUuid, Integer beaconMajor, Integer beaconMinor, Integer beaconRssi) {
         this.beaconName = beaconName;
         this.beaconMac = beaconMac;
         this.beaconCompanyId = beaconCompanyId;
@@ -22,6 +23,7 @@ public class BeaconInfo {
         this.beaconUuid = beaconUuid;
         this.beaconMajor = beaconMajor;
         this.beaconMinor = beaconMinor;
+        this.beaconRssi = beaconRssi;
     }
 
     public String getBeaconName() {
@@ -88,6 +90,14 @@ public class BeaconInfo {
         this.beaconMinor = beaconMinor;
     }
 
+    public Integer getBeaconRssi() {
+        return beaconRssi;
+    }
+
+    public void setBeaconRssi(Integer beaconRssi) {
+        this.beaconRssi = beaconRssi;
+    }
+
     @Override
     public String toString() {
         return "BeaconInfo{" +
@@ -99,6 +109,7 @@ public class BeaconInfo {
                 ", beaconUuid='" + beaconUuid + '\'' +
                 ", beaconMajor=" + beaconMajor +
                 ", beaconMinor=" + beaconMinor +
+                ", beaconRssi=" + beaconRssi +
                 '}';
     }
 }
